@@ -19,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 import java.time.LocalDate;
@@ -33,8 +34,9 @@ public class SecurityConfig {
         http.authorizeHttpRequests((requests) ->
                 requests
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/csrf-token").permitAll()
                         .anyRequest().authenticated());
-        http.csrf((csrf) -> csrf.disable());
+        http.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
         http.addFilterAfter(new RequestValidationFilter(), AuthorizationFilter.class);
         http.httpBasic(Customizer.withDefaults());
         return http.build();

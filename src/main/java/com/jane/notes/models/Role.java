@@ -30,4 +30,8 @@ public class Role {
     @ToString.Exclude
     @JsonBackReference
     private Set<User> users = new HashSet<>();
+
+    public Role(AppRole roleName) {
+        this.roleName = roleName;
+    }
 }

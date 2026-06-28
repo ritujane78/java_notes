@@ -1,0 +1,33 @@
+package com.jane.notes.models;
+
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.sql.Ref;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Table(name = "roles")
+public class Role {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer roleId;
+
+    @ToString.Exclude
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, name = "role_name")
+    private AppRole roleName;
+
+    @OneToMany(mappedBy = "role", fetch=FetchType.LAZY, cascade = { CascadeType.MERGE})
+    @ToString.Exclude
+    @JsonBackReference
+    private Set<User> users = new HashSet<>();
+}

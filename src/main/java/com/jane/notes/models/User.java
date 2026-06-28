@@ -2,6 +2,7 @@ package com.jane.notes.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,12 @@ public class User {
     @Size(max = 20)
     @Column(name = "username")
     private String username;
+
+    @NotBlank
+    @Size(max = 50)
+    @Email
+    @Column(name = "email")
+    private String email;
 
     @NotBlank
     @Size(max = 120)

@@ -5,10 +5,15 @@ import com.jane.notes.models.Role;
 import com.jane.notes.models.User;
 import com.jane.notes.repositories.RoleRepository;
 import com.jane.notes.repositories.UserRepository;
+import com.jane.notes.security.jwt.AuthEntryPointJwt;
+import com.jane.notes.security.jwt.AuthTokenFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,6 +33,13 @@ import java.time.LocalDate;
 @EnableWebSecurity
 //@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
+
+    @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
@@ -35,9 +47,15 @@ public class SecurityConfig {
                 requests
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/csrf-token").permitAll()
+                        .requestMatchers("/api/auth/public/**").permitAll()
                         .anyRequest().authenticated());
-        http.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
-        http.addFilterAfter(new RequestValidationFilter(), AuthorizationFilter.class);
+        http.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                                                    .ignoringRequestMatchers("/api/auth/public/**"));
+//        http.addFilterAfter(new RequestValidationFilter(), AuthorizationFilter.class);
+        http.exceptionHandling(exception
+                -> exception.authenticationEntryPoint(unauthorizedHandler));
+        http.addFilterBefore(authenticationJwtTokenFilter(),
+                UsernamePasswordAuthenticationFilter.class);
         http.httpBasic(Customizer.withDefaults());
         return http.build();
     }
@@ -84,5 +102,11 @@ public class SecurityConfig {
                 userRepository.save(admin);
             }
         };
+    }
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

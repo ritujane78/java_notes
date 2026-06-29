@@ -5,6 +5,9 @@ spring:
     url: jdbc:mysql://localhost:3306/securenotes
     username: root
     password: root
+  app:
+    jwtSecret: VGhpc0lzQVN1cGVyU2VjcmV0S2V5Rm9ySldUU2lnbmluZzEyMzQ1Njc4OTA=
+    jwtExpirationMs: 172800000
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,4 +18,4 @@ logging:
   level:
     org:
       springframework:
-        security: DEBUG
+        security: TRACE

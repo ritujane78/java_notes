@@ -19,3 +19,5 @@ logging:
     org:
       springframework:
         security: TRACE
+frontend:
+  url: http://localhost:3000

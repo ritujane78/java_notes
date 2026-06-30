@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
         http.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                                                     .ignoringRequestMatchers("/api/auth/public/**"));
+        http.cors(Customizer.withDefaults());
 //        http.addFilterAfter(new RequestValidationFilter(), AuthorizationFilter.class);
         http.exceptionHandling(exception
                 -> exception.authenticationEntryPoint(unauthorizedHandler));
